@@ -1,17 +1,30 @@
 import React from 'react';
 import { Phone, MessageSquare, Video, Users, ChevronDown } from 'lucide-react';
+import { useInteractions } from '../InteractionContext'; // কন্টেক্সট ইম্পোর্ট
 
 const Timeline = () => {
-  // ডামি ডাটা - আপনার ইমেজের সাথে মিল রেখে
-  const interactions = [
-    { type: 'Meetup', person: 'Tom Baker', date: 'March 29, 2026', icon: <Users size={18} className="text-yellow-600" />, bgColor: 'bg-yellow-50' },
-    { type: 'Text', person: 'Sarah Chen', date: 'March 28, 2026', icon: <MessageSquare size={18} className="text-gray-400" />, bgColor: 'bg-white' },
-    { type: 'Meetup', person: 'Olivia Martinez', date: 'March 25, 2026', icon: <Users size={18} className="text-yellow-600" />, bgColor: 'bg-yellow-50' },
-    { type: 'Video', person: 'Aisha Patel', date: 'March 23, 2026', icon: <Video size={18} className="text-gray-400" />, bgColor: 'bg-white' },
-    { type: 'Meetup', person: 'Sarah Chen', date: 'March 21, 2026', icon: <Users size={18} className="text-yellow-600" />, bgColor: 'bg-yellow-50' },
-    { type: 'Call', person: 'Marcus Johnson', date: 'March 19, 2026', icon: <Phone size={18} className="text-green-600" />, bgColor: 'bg-white' },
-    { type: 'Meetup', person: 'Aisha Patel', date: 'March 17, 2026', icon: <Users size={18} className="text-yellow-600" />, bgColor: 'bg-yellow-50' },
-  ];
+  const { timelineData } = useInteractions(); // গ্লোবাল ডাটা নেওয়া হচ্ছে
+
+  // আইকন সিলেক্ট করার ফাংশন
+  const getIcon = (type) => {
+    switch (type) {
+      case 'Call':
+        return <Phone size={18} className="text-green-600" />;
+      case 'Text':
+        return <MessageSquare size={18} className="text-blue-500" />;
+      case 'Video':
+        return <Video size={18} className="text-purple-500" />;
+      case 'Meetup':
+        return <Users size={18} className="text-yellow-600" />;
+      default:
+        return <Users size={18} className="text-gray-400" />;
+    }
+  };
+
+  // ব্যাকগ্রাউন্ড কালার সিলেক্ট করার ফাংশন
+  const getBgColor = (type) => {
+    return type === 'Meetup' ? 'bg-yellow-50' : 'bg-white';
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
@@ -28,27 +41,35 @@ const Timeline = () => {
 
       {/* Timeline Items */}
       <div className="flex flex-col gap-4">
-        {interactions.map((item, index) => (
-          <div 
-            key={index} 
-            className={`flex items-center gap-4 p-5 rounded-2xl border border-gray-50 shadow-sm transition-all hover:shadow-md cursor-pointer ${item.bgColor}`}
-          >
-            {/* Icon Circle */}
-            <div className="w-10 h-10 flex items-center justify-center">
-              {item.icon}
-            </div>
-
-            {/* Content */}
-            <div className="flex flex-col">
-              <p className="text-sm font-bold text-gray-500">
-                <span className="text-[#2B4E41]">{item.type}</span> with {item.person}
-              </p>
-              <p className="text-xs font-bold text-gray-300 mt-0.5">
-                {item.date}
-              </p>
-            </div>
+        {/* যদি কোনো ডাটা না থাকে */}
+        {timelineData.length === 0 ? (
+          <div className="py-20 text-center bg-white rounded-3xl border border-dashed border-gray-200">
+            <p className="text-gray-400 font-bold italic">No interactions logged yet. Go to a friend's profile to start!</p>
           </div>
-        ))}
+        ) : (
+          /* লুপ চালিয়ে ডাটা দেখানো হচ্ছে */
+          timelineData.map((item, index) => (
+            <div 
+              key={index} 
+              className={`flex items-center gap-4 p-5 rounded-2xl border border-gray-50 shadow-sm transition-all hover:shadow-md cursor-pointer animate-in fade-in slide-in-from-top-2 duration-500 ${getBgColor(item.type)}`}
+            >
+              {/* Icon Circle */}
+              <div className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-full">
+                {getIcon(item.type)}
+              </div>
+
+              {/* Content */}
+              <div className="flex flex-col">
+                <p className="text-sm font-bold text-gray-500">
+                  <span className="text-[#2B4E41] font-black">{item.type}</span> with {item.person}
+                </p>
+                <p className="text-xs font-bold text-gray-300 mt-0.5">
+                  {item.date}
+                </p>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
